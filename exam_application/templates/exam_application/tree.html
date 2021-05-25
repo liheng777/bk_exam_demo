@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block head %}
+    <title>{% trans "蓝鲸开发框架" %}</title>
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <!-- 建立一个div容器 -->
+    <div id="topo_tree"></div>
+
+{% endblock %}
+
+{% block extra_block %}
+    <!--
+        这里放置子页面中附加内容，一般为js，注意子模版中的js如果使用到以上js库，必须放置在这里
+     -->
+    <script>
+        $(function () {
+
+            $('#topo_tree').hide();
+            tree();
+            $('#topo_tree').jstree({
+                'core': {
+                    "themes": {
+                        "icons": false,
+                        "variant": "large"//设置节点间距离
+                    },
+                    'data': [],
+                    'animation': false,//取消树列表的显示隐藏运动效果
+                    "multiple": false//是否支持多选
+                },
+                "checkbox": {
+                    "keep_selected_style": false//选中后当前节点是否添加样式
+                },
+                "plugins": ["checkbox"]//是否添加复选框
+            }).on("changed.jstree", function (e, data) {
+                if (data.selected.length) {
+                    alert('The selected node is: ' + data.instance.get_node(data.selected[0]).text);
+                }
+            });
+        });
+
+        function tree() {
+            $.ajax({
+                url: 'https://magicbox.bk.tencent.com/static_api/v3/assets/jstree-3.1.1/demo/basic/root.json',
+                type: 'GET',
+                success: function (res) {
+                    console.log(res);
+                    $('#topo_tree').jstree(true).settings.core.data = res;
+                    $('#topo_tree').jstree(true).refresh();
+                }
+            });
+            $('#topo_tree').show();
+        }
+    </script>
+{% endblock %}

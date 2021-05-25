@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block head %}
+	<title>{%trans "蓝鲸开发框架" %}</title>
+	{{ block.super }}
+{% endblock %}
+
+{% block content %}
+    
+{% endblock %}
+
+{% block extra_block %}
+    <!--
+        这里放置子页面中附加内容，一般为js，注意子模版中的js如果使用到以上js库，必须放置在这里
+     -->
+{% endblock %}

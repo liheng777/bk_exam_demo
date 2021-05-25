@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block head %}
+    <title>{% trans "蓝鲸开发框架" %}</title>
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <form class="bk-form m15">
+        <div class="row">
+            <div class="col-md-4 col-lg-4 col-xs-4">
+               <div class="bk-form-item mb20">
+                    <label class="bk-label pr15" style="width:80px;">告警源头</label>
+                    <div class="bk-form-content" style="margin-left:80px;">
+                        <!-- select2 通过ajax start -->
+                        <input type="hidden" id="select2_box" value="null"  style="width:100%;">
+                        <!-- select2 通过ajax end -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-4 col-xs-4">
+                <div class="bk-form-item mb20">
+                    <label class="bk-label pr15" style="width:80px;">时间段</label>
+                    <div class="bk-form-content" style="margin-left:80px;">
+                        <input type="text" class="form-control daterangepicker_demo" id="daterangepicker_demo3"
+                               placeholder="选择日期...">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-4 col-lg-4 col-xs-4">
+                <div class="bk-form-item mb20">
+                    <label class="bk-label pr15" style="width:80px;">日期</label>
+                    <div class="bk-form-content" style="margin-left:80px;">
+                        <input type="text" class="bk-form-input" placeholder="请输入关键字" style="width:100%;">
+                    </div>
+                </div>
+                <div class="bk-form-item mb20">
+                    <label class="bk-label pr15" style="width:80px;">城市</label>
+                    <div class="bk-form-content" style="margin-left:80px;">
+                        <select name="" id="" class="bk-form-select" style="width:100%;" placeholder="请选择">
+                            <option value="">请选择</option>
+                            <option value="">1</option>
+                            <option value="">2</option>
+                            <option value="">3</option>
+                            <option value="">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="bk-form-item">
+                    <label class="bk-label pr15" style="width:80px;"></label>
+                    <div class="bk-form-content tr">
+                        <button class="bk-button bk-success">查询</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--HTML-->
+    <div class="king-block king-block-bordered">
+        <div class="king-block-header king-gray-light">
+            <h3 class="king-block-title">html数据源</h3>
+        </div>
+        <div class="king-block-content">
+            <table id="table2_demo1" class="table table-bordered table-hover">
+
+            </table>
+        </div>
+    </div>
+    <!-- 设置面板End -->
+{% endblock %}
+
+{% block extra_block %}
+    <!--
+        这里放置子页面中附加内容，一般为js，注意子模版中的js如果使用到以上js库，必须放置在这里
+     -->
+    <script>
+        $(function () {
+            // 异步请求后台数据
+            selectList({});
+            var data = [{id: 'null', text: '请选择'},{id: 0, text: '奥迪'}, {id: 1, text: '奔驰'}, {id: 1, text: '宝马'}];
+            selectOption(data)
+
+        });
+
+        function selectOption(data) {
+            $("#select2_box").select2({
+                data: data,
+                minimumResultsForSearch: -1,
+                allowClear: false
+
+            });
+        }
+
+        // 时间范围选择
+        $('#daterangepicker_demo3').daterangepicker({
+            "showDropdowns": true,//显示年，月下拉选择框
+            "showWeekNumbers": true,//显示第几周
+            "timePicker": true,//时间选择
+            "timePicker24Hour": true,//24小时制
+            "timePickerIncrement": 1,//时间间隔
+            "timePickerSeconds": true,
+            "dateLimit": { //可选择的日期范围
+                "days": 30
+            },
+            "ranges": {
+                "前7天": [moment().subtract(6, 'days'), moment()],
+                "前30天": [moment().subtract(29, 'days'), moment()],
+                "本月": [moment().startOf('month'), moment().endOf('month')],
+                "上个月": [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            },
+            "locale": {
+                "format": "YYYY-MM-DD HH:mm:ss",// 日期格式
+                "separator": " 至 ",
+                "applyLabel": "确定",
+                "cancelLabel": "取消",
+                "fromLabel": "从",
+                "toLabel": "到",
+                "weekLabel": '周',
+                "customRangeLabel": "自定义",
+                "daysOfWeek": [
+                    "日",
+                    "一",
+                    "二",
+                    "三",
+                    "四",
+                    "五",
+                    "六"
+                ],
+                "monthNames": [
+                    "一月",
+                    "二月",
+                    "三月",
+                    "四月",
+                    "五月",
+                    "六月",
+                    "七月",
+                    "八月",
+                    "九月",
+                    "十月",
+                    "十一月",
+                    "十二月"
+                ],
+                "firstDay": 1// 周开始时间
+            },
+            "startDate": "2015-07-01 10:35:20",
+            "endDate": "2015-08-15 10:35:20",
+            "opens": "center",//left/center/right
+            "drops": "down",//选择框出现的位置 up/down
+            "buttonClasses": "btn btn-sm",//按钮通用样式
+            "applyClass": "btn-success",//确定按钮样式
+            "cancelClass": "btn-default"//取消按钮样式
+        });
+
+        // 列表前端分页
+        function selectList(data) {
+            console.log(data);
+            var language = {
+                search: '搜索：',
+                lengthMenu: "每页显示 _MENU_ 记录",
+                zeroRecords: "没找到相应的数据！",
+                info: "分页 _PAGE_ / _PAGES_",
+                infoEmpty: "暂无数据！",
+                infoFiltered: "(从 _MAX_ 条数据中搜索)",
+                paginate: {
+                    first: '首页',
+                    last: '尾页',
+                    previous: '上一页',
+                    next: '下一页',
+                }
+            };
+
+            var data_list = [];
+            // 异步请求后台数据
+            $.ajax({
+                url: 'https://magicbox.bk.tencent.com/static_api/v3/components/table6/data.json',
+                type: 'GET',
+                success: function (res) {
+                    data_list = res.items;
+                    return res.items;
+                },
+                complete: function () {
+                    $('#table2_demo1').dataTable({
+                        paging: true, //隐藏分页
+                        ordering: false, //关闭排序
+                        info: false, //隐藏左下角分页信息
+                        searching: false, //关闭搜索
+                        pageLength: 2, //每页显示几条数据
+                        lengthChange: false, //不允许用户改变表格每页显示的记录数
+                        language: language, //汉化
+                        data: data_list,
+                        columns: [
+                            {title: 'index', data: 'index', width: 100},
+                            {title: 'columnName1', data: 'columnName1', width: 100},
+                            {title: 'columnName2', data: 'columnName2'},
+                            {title: 'columnName3', data: 'columnName3'},
+                            {title: 'columnName4', data: 'columnName4'},
+                        ]
+                    });
+                }
+            });
+        }
+    </script>
+{% endblock %}
+
